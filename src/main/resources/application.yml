@@ -20,12 +20,3 @@ management:
     web:
       exposure:
         include: ["prometheus","health","refresh"]
-
-system:
-  aws:
-    sqs:
-      name: notification-queue
-    access:
-      key: AKIA34V4PZUUDM7FYUMD
-    secret:
-      key: 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
