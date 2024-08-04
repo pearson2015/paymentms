@@ -48,7 +48,7 @@ public class PaymentServiceTests {
         when(paymentRepository.findAll()).thenReturn(List.of(payment));
         List<Payment> payments= paymentService.getAllPayments();
         assert payments.size() == 1;
-        assert payments.getFirst().getAmount() == 100;
+        assert payments.getFirst().getPrice() == 100;
     }
 
     @Test
@@ -99,7 +99,7 @@ public class PaymentServiceTests {
         when(paymentRepository.findById(1L)).thenReturn(ofNullable(payment));
         Payment payment= paymentService.getPaymentById(1L);
         assert payment != null;
-        assert payment.getAmount() == 100;
+        assert payment.getPrice() == 100;
     }
 
     @Test

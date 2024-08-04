@@ -35,6 +35,12 @@ public class PaymentController {
         return paymentService.getPaymentByEmail(email);
     }
 
+    @RequestMapping("/payment/transactionid/{transactionId}")
+    public Payment getPaymentByTransactionId(@PathVariable ("transactionId") String transactionId) {
+        logger.info("Getting all payments with transactionId: " + transactionId);
+        return paymentService.getPaymentByTransactionId(transactionId);
+    }
+
     @PostMapping("/payment")
     public Payment doPayment(@RequestBody Payment payment) {
         logger.info("Request for doPayment " + payment);

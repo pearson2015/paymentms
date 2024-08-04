@@ -37,6 +37,11 @@ public class PaymentService {
         return paymentRepository.findByEmail(email);
     }
 
+    public Payment getPaymentByTransactionId(String transactionId) {
+        logger.info("Getting payment with transactionId: " + transactionId + " from service layer");
+        return paymentRepository.findByPaymentTransactionId(transactionId);
+    }
+
     public Payment doPayment(Payment payment) {
         logger.info("Initiating payment: " + payment + " from service layer");
         //Call to payment gateway
@@ -51,7 +56,7 @@ public class PaymentService {
             message.setEmail(payment.getEmail());
             message.setMessage("Payment completed successfully");
             message.addData("paymentTransactionId", payment.getPaymentTransactionId());
-            message.addData("amount", payment.getAmount());
+            message.addData("price", payment.getPrice());
 
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
@@ -65,19 +70,19 @@ public class PaymentService {
         if(payment == null)
             return false;
         logger.info("Refunding payment with Id: " + id + " from service layer");
+        //call to payment gateway to refund
+        paymentRepository.deleteById(id);
         try {
             Message message = new Message();
             message.setEmail(payment.getEmail());
             message.setMessage("Payment refunded successfully");
             message.addData("paymentTransactionId", payment.getPaymentTransactionId());
-            message.addData("amount", payment.getAmount());
+            message.addData("price", payment.getPrice());
 
             //sqsService.sendMessage(objectMapper.writeValueAsString(message));
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
         }
-
-        paymentRepository.deleteById(id);
         return true;
     }
 

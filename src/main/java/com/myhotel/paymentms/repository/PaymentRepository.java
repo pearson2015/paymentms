@@ -8,6 +8,9 @@ import java.util.List;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long>{
 
-    public List<Payment> findByEmail(String email);
-    public void deleteByEmail(String email);
+    List<Payment> findByEmail(String email);
+
+    Payment findByPaymentTransactionId(String paymentTransactionId);
+
+    void deleteByEmail(String email);
 }

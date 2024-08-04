@@ -19,7 +19,7 @@ public class Payment {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
     private String email;
-    private double amount;
+    private double price;
     private String paymentMethod;
     private String paymentStatus;
     private Date paymentDate;
