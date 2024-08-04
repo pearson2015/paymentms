@@ -20,9 +20,9 @@ public class Payment {
     private Long id;
     private String email;
     private double amount;
-    private String transactionId;
     private String paymentMethod;
     private String paymentStatus;
     private Date paymentDate;
+    private String paymentTransactionId;
 
 }

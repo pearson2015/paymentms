@@ -32,14 +32,13 @@ public class PaymentServiceTests {
 
     @BeforeAll
     public static void setUp() {
-        System.out.println("Setting up");
         payment = new Payment(1L,
                 "test@test.com",
                 100,
-                UUID.randomUUID().toString(),
                 "CREDITCARD",
                 "SUCCESS",
-                new Date());
+                new Date(),
+                UUID.randomUUID().toString());
     }
 
     @Test
@@ -77,17 +76,17 @@ public class PaymentServiceTests {
         Payment payment1 = new Payment(1L,
                 "test1@test.com",
                 100,
-                UUID.randomUUID().toString(),
                 "CREDITCARD",
                 "SUCCESS",
-                new Date());
+                new Date(),
+                UUID.randomUUID().toString());
         Payment payment2 = new Payment(1L,
                 "test2@test.com",
                 200,
-                UUID.randomUUID().toString(),
                 "CREDITCARD",
                 "SUCCESS",
-                new Date());
+                new Date(),
+                UUID.randomUUID().toString());
         when(paymentRepository.findAll()).thenReturn(List.of(payment1, payment2));
         List<Payment> payments= paymentService.getAllPayments();
         assert payments.size() == 2;

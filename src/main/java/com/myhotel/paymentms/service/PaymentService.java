@@ -18,9 +18,6 @@ public class PaymentService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private SQSService sqsService;
-
-    @Autowired
     private PaymentRepository paymentRepository;
 
     ObjectMapper  objectMapper = new ObjectMapper();
@@ -43,7 +40,7 @@ public class PaymentService {
     public Payment doPayment(Payment payment) {
         logger.info("Initiating payment: " + payment + " from service layer");
         //Call to payment gateway
-        payment.setTransactionId(UUID.randomUUID().toString());
+        payment.setPaymentTransactionId(UUID.randomUUID().toString());
         payment.setPaymentStatus("SUCCESS");
         payment.setPaymentDate(new Date());
         payment.setPaymentMethod("CREDITCARD");
@@ -53,10 +50,9 @@ public class PaymentService {
             Message message = new Message();
             message.setEmail(payment.getEmail());
             message.setMessage("Payment completed successfully");
-            message.addData("transactionId", payment.getTransactionId());
+            message.addData("paymentTransactionId", payment.getPaymentTransactionId());
             message.addData("amount", payment.getAmount());
 
-            sqsService.sendMessage(objectMapper.writeValueAsString(message));
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
         }
@@ -73,10 +69,10 @@ public class PaymentService {
             Message message = new Message();
             message.setEmail(payment.getEmail());
             message.setMessage("Payment refunded successfully");
-            message.addData("transactionId", payment.getTransactionId());
+            message.addData("paymentTransactionId", payment.getPaymentTransactionId());
             message.addData("amount", payment.getAmount());
 
-            sqsService.sendMessage(objectMapper.writeValueAsString(message));
+            //sqsService.sendMessage(objectMapper.writeValueAsString(message));
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
         }
