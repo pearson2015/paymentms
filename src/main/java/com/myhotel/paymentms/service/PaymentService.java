@@ -20,6 +20,9 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @Autowired
+    private ProducerService producerService;
+
     ObjectMapper  objectMapper = new ObjectMapper();
 
     public List<Payment> getAllPayments() {
@@ -57,7 +60,7 @@ public class PaymentService {
             message.setMessage("Payment completed successfully");
             message.addData("paymentTransactionId", payment.getPaymentTransactionId());
             message.addData("price", payment.getPrice());
-
+            producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
         }
@@ -78,17 +81,11 @@ public class PaymentService {
             message.setMessage("Payment refunded successfully");
             message.addData("paymentTransactionId", payment.getPaymentTransactionId());
             message.addData("price", payment.getPrice());
-
-            //sqsService.sendMessage(objectMapper.writeValueAsString(message));
+            producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
         } catch(Exception e) {
             logger.error("Error while sending message to SQS", e);
         }
         return true;
-    }
-
-    public void refundAllPaymentByEmail(String email) {
-        logger.info("Refunding all payments with email: " + email + " from service layer");
-        paymentRepository.deleteByEmail(email);
     }
 
 }

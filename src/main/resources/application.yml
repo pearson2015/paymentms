@@ -13,6 +13,10 @@ spring:
     spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
     properties.hibernate.format_sql: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
 eureka:
   client:
     serviceUrl:
@@ -22,3 +26,6 @@ management:
     web:
       exposure:
         include: ["prometheus","health","refresh"]
+
+system:
+  notificationTopic: notification_topic
