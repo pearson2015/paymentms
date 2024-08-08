@@ -17,6 +17,8 @@ public class PaymentService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private enum PaymentStatus {COMPLETED, FAILED}
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -49,7 +51,7 @@ public class PaymentService {
         logger.info("Initiating payment: " + payment + " from service layer");
         //Call to payment gateway
         payment.setPaymentTransactionId(UUID.randomUUID().toString());
-        payment.setPaymentStatus("SUCCESS");
+        payment.setPaymentStatus(PaymentStatus.COMPLETED.name());
         payment.setPaymentDate(new Date());
         payment.setPaymentMethod("CREDITCARD");
         logger.info("Paid payment: " + payment);
@@ -62,30 +64,26 @@ public class PaymentService {
             message.addData("price", payment.getPrice());
             producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
         } catch(Exception e) {
-            logger.error("Error while sending message to SQS", e);
+            logger.error("Error while sending message to Kafka", e);
         }
 
         return paymentRepository.save(payment);
     }
 
-    public boolean refundPayment(long id) {
-        Payment payment = paymentRepository.findById(id).orElse(null);
-        if(payment == null)
-            return false;
-        logger.info("Refunding payment with Id: " + id + " from service layer");
+    public Payment cancelPayment(Payment payment) {
+        logger.info("Cancelling payment: " + payment + " from service layer");
         //call to payment gateway to refund
-        paymentRepository.deleteById(id);
         try {
             Message message = new Message();
             message.setEmail(payment.getEmail());
-            message.setMessage("Payment refunded successfully");
+            message.setMessage("Payment " + payment.getPaymentStatus().toLowerCase() + " successfully");
             message.addData("paymentTransactionId", payment.getPaymentTransactionId());
             message.addData("price", payment.getPrice());
             producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
         } catch(Exception e) {
-            logger.error("Error while sending message to SQS", e);
+            logger.error("Error while sending message to Kafka", e);
         }
-        return true;
+        return paymentRepository.save(payment);
     }
 
 }

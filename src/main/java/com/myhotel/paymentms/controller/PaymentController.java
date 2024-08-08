@@ -47,10 +47,10 @@ public class PaymentController {
         return paymentService.doPayment(payment);
     }
 
-    @DeleteMapping("/payment/{id}")
-    public boolean refundPayment(@PathVariable ("id") Long id) {
-        logger.info("Refunding payment with id: " + id);
-        return paymentService.refundPayment(id);
+    @PutMapping("/payment")
+    public Payment cancelPayment(@RequestBody Payment payment) {
+        logger.info("Request for doPayment " + payment);
+        return paymentService.cancelPayment(payment);
     }
 
 }

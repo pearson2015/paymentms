@@ -27,5 +27,9 @@ management:
       exposure:
         include: ["prometheus","health","refresh"]
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
 system:
   notificationTopic: notification_topic
