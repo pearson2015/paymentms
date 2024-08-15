@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long>{
+public interface PaymentRepository extends JpaRepository<Payment, String>{
 
     List<Payment> findByEmail(String email);
 

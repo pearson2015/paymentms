@@ -16,10 +16,10 @@ import java.util.Date;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    private String paymentId;
     private String email;
     private double price;
+    private String roomId;
     private String paymentMethod;
     private String paymentStatus;
     private Date paymentDate;
