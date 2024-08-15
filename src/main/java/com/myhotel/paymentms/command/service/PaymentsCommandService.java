@@ -2,6 +2,7 @@ package com.myhotel.paymentms.command.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myhotel.paymentms.command.CreatePaymentCommand;
+import com.myhotel.paymentms.command.UpdatePaymentCommand;
 import com.myhotel.paymentms.dto.PaymentRequest;
 import com.myhotel.paymentms.entity.Message;
 import com.myhotel.paymentms.service.ProducerService;
@@ -35,27 +36,47 @@ public class PaymentsCommandService {
         //Call to payment gateway
 
         CreatePaymentCommand createPaymentCommand = CreatePaymentCommand.builder()
-                .paymentId(paymentRequest.getPaymentId() != null
-                        ? paymentRequest.getPaymentId()
-                        : UUID.randomUUID().toString())
+                .paymentId(UUID.randomUUID().toString())
                 .email(paymentRequest.getEmail())
                 .price(paymentRequest.getPrice())
                 .roomId(paymentRequest.getRoomId())
                 .paymentMethod("CREDITCARD")
-                .paymentStatus(paymentRequest.getPaymentStatus() != null
-                        ? paymentRequest.getPaymentStatus()
-                        : PaymentStatus.COMPLETED.name())
+                .paymentStatus(PaymentStatus.COMPLETED.name())
                 .paymentDate(new Date())
                 .paymentTransactionId(UUID.randomUUID().toString())
+                .build();
+
+        try {
+            Message message = new Message();
+            message.setEmail(paymentRequest.getEmail());
+            message.setMessage("Payment completed successfully");
+            message.addData("paymentId", paymentRequest.getPaymentId());
+            message.addData("price", paymentRequest.getPrice());
+            producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
+        } catch(Exception e) {
+            logger.error("Error while sending message to Kafka", e);
+        }
+        String paymentId = commandGateway.sendAndWait(createPaymentCommand);
+        paymentId = paymentId != null && paymentId.contains("::")
+                ? paymentId.split("::")[1]
+                : paymentId;
+        return paymentId;
+    }
+
+    public String updatePayment(PaymentRequest paymentRequest) {
+        logger.info("Refunding payment for: " + paymentRequest);
+        //Call to payment gateway
+
+        UpdatePaymentCommand updatePaymentCommand = UpdatePaymentCommand.builder()
+                .paymentId(paymentRequest.getPaymentId())
+                .paymentStatus(paymentRequest.getPaymentStatus())
                 .build();
 
 
         try {
             Message message = new Message();
             message.setEmail(paymentRequest.getEmail());
-            message.setMessage("Payment "
-                    + createPaymentCommand.getPaymentStatus().toLowerCase()
-                    + " successfully");
+            message.setMessage("Payment refunded successfully");
             message.addData("paymentTransactionId", paymentRequest.getPaymentTransactionId());
             message.addData("price", paymentRequest.getPrice());
             producerService.sendMessage("PaymentNotification", objectMapper.writeValueAsString(message));
@@ -63,7 +84,11 @@ public class PaymentsCommandService {
             logger.error("Error while sending message to Kafka", e);
         }
 
-        return commandGateway.sendAndWait(createPaymentCommand);
+        String paymentId = commandGateway.sendAndWait(updatePaymentCommand);
+        paymentId = paymentId != null && paymentId.contains("::")
+                ? paymentId.split("::")[1]
+                : paymentId;
+        return paymentId;
     }
 
 }

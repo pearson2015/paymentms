@@ -1,6 +1,7 @@
 package com.myhotel.paymentms.command;
 
 import com.myhotel.paymentms.core.events.PaymentCreatedEvent;
+import com.myhotel.paymentms.core.events.PaymentUpdatedEvent;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -27,7 +28,7 @@ public class PaymentAggregate {
 
     @CommandHandler
     public PaymentAggregate(CreatePaymentCommand createPaymentCommand) {
-        // Validate Update RoomRequest Command
+        // Validate Create Payment Command
 
         PaymentCreatedEvent paymentCreatedEvent = new PaymentCreatedEvent();
         BeanUtils.copyProperties(createPaymentCommand, paymentCreatedEvent);
@@ -35,9 +36,19 @@ public class PaymentAggregate {
         AggregateLifecycle.apply(paymentCreatedEvent);
     }
 
+    @CommandHandler
+    public PaymentAggregate(UpdatePaymentCommand updatePaymentCommand) {
+        // Validate Update Payment Command
+
+        PaymentUpdatedEvent paymentUpdatedEvent = new PaymentUpdatedEvent();
+        BeanUtils.copyProperties(updatePaymentCommand, paymentUpdatedEvent);
+
+        AggregateLifecycle.apply(paymentUpdatedEvent);
+    }
+
     @EventSourcingHandler
     public void on(PaymentCreatedEvent paymentCreatedEvent) {
-        this.paymentId = paymentCreatedEvent.getPaymentId();
+        this.paymentId = "Create::" + paymentCreatedEvent.getPaymentId();
         this.email = paymentCreatedEvent.getEmail();
         this.price = paymentCreatedEvent.getPrice();
         this.roomId = paymentCreatedEvent.getRoomId();
@@ -47,5 +58,10 @@ public class PaymentAggregate {
         this.paymentTransactionId = paymentCreatedEvent.getPaymentTransactionId();
     }
 
+    @EventSourcingHandler
+    public void on(PaymentUpdatedEvent paymentUpdatedEvent) {
+        this.paymentId = "Update::" + paymentUpdatedEvent.getPaymentId();
+        this.paymentStatus = paymentUpdatedEvent.getPaymentStatus();
+    }
 
 }

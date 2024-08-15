@@ -5,10 +5,7 @@ import com.myhotel.paymentms.dto.PaymentRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/paymentms")
@@ -23,5 +20,11 @@ public class PaymentsCommandController {
     public String doPayment(@RequestBody PaymentRequest payment) {
         logger.info("Request for doPayment " + payment);
         return paymentsCommandService.createPayment(payment);
+    }
+
+    @PutMapping("/payment")
+    public String updatePayment(@RequestBody PaymentRequest payment) {
+        logger.info("Request for updatePayment " + payment);
+        return paymentsCommandService.updatePayment(payment);
     }
 }
