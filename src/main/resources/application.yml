@@ -27,6 +27,9 @@ management:
     web:
       exposure:
         include: ["prometheus","health","refresh"]
+  tracing:
+    sampling:
+      probability: 1
 
 springdoc:
   swagger-ui:
